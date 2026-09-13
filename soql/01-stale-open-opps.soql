@@ -1,0 +1,6 @@
+SELECT Id, Name, StageName, Amount, CloseDate, Owner.Name, NextStep
+FROM Opportunity
+WHERE IsClosed = false
+  AND CloseDate < TODAY
+ORDER BY CloseDate ASC
+LIMIT 50

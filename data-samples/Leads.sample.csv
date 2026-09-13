@@ -1,0 +1,6 @@
+FirstName,LastName,Company,Title,Email,Phone,Status,LeadSource,Industry,State,Description,OwnerEmail,Region__c,Segment__c
+Drew,Prospect01,Southbay Gyms,VP Sales,prospect01@leadmail.example.com,941-555-4001,Open - Not Contacted,Inbound,Manufacturing,GA,Owner=Priya Shah,priya.shah@gulfcoastgtm.example,West,Mid-Market
+Jordan,Prospect02,ClearSpan Awnings,IT Manager,prospect02@leadmail.example.com,941-555-4002,Open - Not Contacted,Inbound,Software,FL,Owner=Elena Vargas,elena.vargas@gulfcoastgtm.example,Central,Enterprise
+Casey,Prospect03,NovaNest Realty,Director Ops,prospect03@leadmail.example.com,941-555-4003,Open - Not Contacted,Referral,Real Estate,FL,Owner=Jordan Blake,jordan.blake@gulfcoastgtm.example,East,SMB
+Avery,Prospect04,Seabreeze Ortho,Director Ops,prospect04@leadmail.example.com,941-555-4004,Nurturing,Event,Healthcare,TX,Owner=Sam Okonkwo,avery.quinn@gulfcoastgtm.example,West,Mid-Market
+Jordan,Prospect05,Ridgeway Plastics,CFO,prospect05@leadmail.example.com,941-555-4005,Working - Contacted,Event,Software,SC,Owner=Avery Quinn,avery.quinn@gulfcoastgtm.example,Central,Enterprise

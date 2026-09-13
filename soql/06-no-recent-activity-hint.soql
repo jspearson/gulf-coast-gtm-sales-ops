@@ -1,0 +1,7 @@
+-- After Tasks/Emails exist, LastActivityDate becomes useful.
+SELECT Id, Name, Owner.Name, StageName, Amount, CloseDate, LastActivityDate, NextStep
+FROM Opportunity
+WHERE IsClosed = false
+  AND (LastActivityDate = null OR LastActivityDate < LAST_N_DAYS:14)
+ORDER BY CloseDate ASC
+LIMIT 200

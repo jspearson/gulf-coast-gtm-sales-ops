@@ -1,0 +1,6 @@
+SELECT Id, Name, Account.Name, Owner.Name, StageName, Amount, CloseDate, NextStep,
+       Region__c, Segment__c, Forecast_Risk__c, Days_Past_Close__c, Is_Stale__c
+FROM Opportunity
+WHERE IsClosed = false AND CloseDate <= TODAY
+ORDER BY CloseDate ASC
+LIMIT 200

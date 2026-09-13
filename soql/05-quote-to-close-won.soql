@@ -1,0 +1,5 @@
+SELECT Id, Name, Owner.Name, Amount, Quote_Sent_Date__c, CloseDate, Quote_to_Close_Days__c, Segment__c
+FROM Opportunity
+WHERE IsWon = true AND Quote_Sent_Date__c != null
+ORDER BY Quote_to_Close_Days__c DESC NULLS LAST
+LIMIT 200
