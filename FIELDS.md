@@ -1,25 +1,25 @@
-# Common fields worth adding next
+# Fields
 
-## Already in this org (Opportunity)
-Region, Segment, Product Line, Forecast Risk, Next Step Last Updated, Quote Sent Date, Primary Quote Amount, Competitors, Days Open, Days Past Close, Has Next Step, Quote to Close Days, Is Stale
+## Already on Opportunity
 
-## High-value next (Director / RevOps)
-| Field / object | Why |
+Region, Segment, Product Line, Forecast Risk, Next Step Last Updated, Quote Sent Date, Primary Quote Amount, Competitors.
+
+Formulas: Days Open, Days Past Close, Has Next Step, Quote to Close Days, Is Stale.
+
+## Worth adding next
+
+| Thing | Why it matters |
 |---|---|
-| **Tasks / Emails / Events** on Opp | Real “motion”; powers LastActivityDate + stuck-without-touch reports |
-| **Content Note** or Chatter | Qualitative context (“champion went dark”) |
-| **Loss_Reason__c** (picklist) | Win/loss analysis |
-| **Original_Close_Date__c** + Push_Count__c | Forecast integrity / sandbagging |
-| **Next_Step_Owner__c** | Accountability |
-| **MEDDICC-lite** (Champion, Economic Buyer checkboxes) | Enterprise motion without full methodology bloat |
-| **Lead.Disqualified_Reason__c** | Funnel honesty |
-| Standard **Forecast Category** discipline | Align with how AEs commit |
+| Tasks / emails / calls on the opp | Gives you Last Activity Date and “no touch in 14 days” |
+| Notes (Content Note or Chatter) | Short context when a deal goes quiet |
+| Loss Reason | Win/loss without guessing |
+| Original Close Date + push count | Shows how often dates slip |
+| Disqualified reason on Lead | Keeps the funnel honest |
 
-## Emails / notes — how Salesforce stores them
-- Logged emails are usually **Tasks** (TaskSubtype = Email) or **EmailMessage** (Email-to-Salesforce)
-- Call notes → Task
-- Longer narrative → **ContentNote** linked to Opp, or Chatter post
-- Don’t invent a custom “Email History” object unless you’re showing integration architecture
+## How email history usually works in Salesforce
 
-## Stuck definition used here
-Open opportunity where **CloseDate ≤ TODAY** (includes today). Pair with Is_Stale__c and missing Next Step for the hygiene board.
+Logged emails are Tasks (often TaskSubtype = Email) or EmailMessage. Call notes are Tasks. Longer writeups are Content Notes linked to the opportunity. I wouldn’t invent a custom “Email History” object unless the story is an integration.
+
+## Stuck opps
+
+Open opportunity where Close Date is today or earlier. Pair with Is Stale and blank Next Step on the hygiene board.
