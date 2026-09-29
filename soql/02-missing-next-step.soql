@@ -1,4 +1,4 @@
-SELECT Id, Name, StageName, CloseDate, Owner.Name
+SELECT Id, Name, StageName, CloseDate, Sales_Rep__r.Name
 FROM Opportunity
 WHERE IsClosed = false
   AND (NextStep = null OR NextStep = '')

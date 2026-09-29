@@ -1,55 +1,206 @@
-# Gulf Coast GTM Co
+# Gulf Coast GTM Co: My Sales Ops Salesforce Portfolio
 
-Personal Salesforce playground I use to practice Sales Ops work — pipeline hygiene, director-facing dashboards, lead conversion, and the SOQL I’d run in Inspector on a real book.
+I'm Joe Pearson, a Salesforce Certified Administrator moving into Sales Ops and RevOps. I built this Salesforce Developer Edition org (Lightning) to show how I'd run Sales Ops for a sales team that gets paid on commission. It covers a Monday pipeline dashboard a sales leader can trust, split credit and quota math for each producer, exception reporting, and a policy data model with relationship SOQL. You can find me on [LinkedIn](https://www.linkedin.com/in/joe-pearson-Salesforce).
 
-I’m Joe Pearson. Day job is Salesforce / ops in P&C. This is not a client org and the companies are fake. It’s a place to show how I’d keep a forecast honest.
+You don't need a login to look through it. I've documented everything below with screenshots, the SOQL I wrote, and the data model. The org holds demo data.
 
-**Playground name:** Gulf Coast GTM Co  
-**LinkedIn:** [joe-pearson-Salesforce](https://www.linkedin.com/in/joe-pearson-Salesforce)
+---
 
-## What’s loaded
+## The business I modeled
 
-- 143 accounts with names that look like real Gulf / Southeast businesses
-- 428 opportunities across Prospecting → Closed Won/Lost, owned by five reps
-- Region, Segment, product line, forecast risk, quote dates, and a few formulas (days open, past close, stale, quote-to-close)
-- Leads with a converted subset so conversion reports aren’t empty
-- Two Lightning dashboards with filters
+Gulf Coast GTM Co is a fictional independent commercial insurance brokerage on the Gulf Coast. I set it up with 144 client accounts across marinas, contractors, hospitality, healthcare, and property management. There are 428 opportunities, and on each one Amount is the estimated annual commission while Premium__c holds the written premium.
 
-Reps in the org: Marcus Cole, Priya Shah, Elena Vargas, Jordan Blake, Avery Quinn (playground license limit stopped at five).
+The coverage lines are Commercial Property, General Liability, Workers Comp, Cyber, and High-Net-Worth Personal Lines. Every opportunity is typed as New Business, Renewal, or Cross-sell. The sales team is 20 producers organized by Region and Team, and a lot of deals are shared between two or three of them.
+
+I built everything around the questions a sales leader asks on Monday morning:
+
+1. What does open pipeline look like by stage and by producer, and what closed recently?
+2. Which deals are past due or stale, and who owns them?
+3. How much credit does each producer actually earn when a deal is split?
+4. Where is each producer against their 2026 plan, and is there enough pipeline to close the gap?
+
+---
+
+## Data model
+
+Here's how the objects relate to each other.
+
+```mermaid
+erDiagram
+    ACCOUNT_CLIENT ||--o{ OPPORTUNITY : "has"
+    CONTACT_EMPLOYEE ||--o{ OPPORTUNITY : "Sales_Rep__c"
+    OPPORTUNITY ||--|{ PRODUCER_SPLIT : "Opportunity__c (master-detail)"
+    CONTACT_EMPLOYEE ||--o{ PRODUCER_SPLIT : "Producer__c"
+    CONTACT_EMPLOYEE ||--o{ SALES_PLAN : "Contact__c (master-detail)"
+    BROKER_GROUP ||--o{ ACCOUNT_AGENCY : "Broker_Group__c"
+    ACCOUNT_AGENCY ||--o{ POLICY : "Agency_Account__c"
+    CONTACT_POLICYHOLDER ||--o{ POLICY : "Policyholder__c"
+    CONTACT_EMPLOYEE |o--o{ POLICY : "Producer__c (optional)"
+
+    ACCOUNT_CLIENT {
+        string Name
+        string Industry
+    }
+    OPPORTUNITY {
+        currency Amount "est. annual commission"
+        currency Premium__c
+        picklist Product_Line__c "coverage line"
+        picklist Type "New Business / Renewal / Cross-sell"
+        picklist Region__c
+        date CloseDate
+        string NextStep
+        checkbox Is_Stale__c "formula"
+        number Days_Past_Close__c "formula"
+    }
+    CONTACT_EMPLOYEE {
+        string Employee_ID__c
+        picklist Region__c
+        string Team__c
+    }
+    PRODUCER_SPLIT {
+        autonumber Name
+        percent Split_Percent__c "sums to 100 per opp"
+        currency Split_Amount__c "formula: Amount x Split %"
+    }
+    SALES_PLAN {
+        string Year__c
+        currency Annual_Revenue_Goal__c
+        currency Closed_Won_Split_Revenue__c
+        currency Open_Split_Pipeline__c
+        percent Percent_to_Goal__c "formula"
+        currency Gap_to_Goal__c "formula"
+        number Pipeline_Coverage__c "formula"
+    }
+    BROKER_GROUP {
+        string Name
+        picklist Region__c
+        string Group_Code__c
+    }
+    ACCOUNT_AGENCY {
+        string Name
+        lookup Broker_Group__c
+    }
+    POLICY {
+        autonumber Name "GTM-00000"
+        picklist Policy_Status__c
+        currency Premium__c
+        picklist Coverage_Line__c
+        date Effective_Date__c
+        date Expiration_Date__c
+    }
+    CONTACT_POLICYHOLDER {
+        string Name
+        checkbox Portal_User__c
+        email Portal_Email__c
+    }
+```
+
+I used record types on Account and Contact so I could stay on standard objects wherever possible. On Account, the Client record type holds the insured businesses, which are the 144 client accounts. The Agency record type is the producing or retail agency, and each one sits under a Broker Group.
+
+On Contact, I set up three record types. Client contacts are the buyers and influencers at client accounts. Employee contacts are the 20 producers, and they carry Region, Team, and Sales Plans. Policyholder contacts are the people tied to policies, and they have a portal flag.
+
+I gave Client and Employee contacts their own Lightning record pages and layouts, assigned by record type. That way producer fields like Region, Team, and Sales Plans never show up on a client record, and client fields like buying role and relationship strength never show up on a producer.
+
+---
+
+## Why I built it this way
+
+### I used custom Producer Splits instead of standard Opportunity Splits
+
+Standard Opportunity Splits give credit to Salesforce Users through Opportunity Team membership. This org is a Developer Edition with only a handful of user licenses, and the sales team is 20 producers. Buying 20 seats just to hold split credit isn't realistic, and plenty of brokerages have producers who don't live in Salesforce every day.
+
+So I made the producers Employee Contacts and put the splits in a custom object called Producer_Split__c. It's a master-detail to Opportunity with a lookup to an Employee Contact, and a lookup filter makes sure only the Employee record type can be picked. Each producer gets a Split_Percent__c, and Split_Amount__c is a formula that multiplies Amount by the split percent.
+
+I loaded 643 split rows across the 428 opportunities. Some deals have a single producer at 100%, some are two-way at 60/40, and some are three-way at 50/30/20. Every opportunity's splits total exactly 100%, and closed-won split dollars equal closed-won Amount.
+
+I think this is the better call for a brokerage. With standard splits, only active Users can receive credit, so 20 producers would mean 20 user licenses. With the custom object, any Employee Contact can get credit without a license, and it costs nothing extra. Standard splits come with their own split report types, while mine uses a standard custom report type that groups by producer and feeds the Sales Plan actuals. Standard splits were built for internal sales teams, and the custom object matches the way producers share commission on a placement.
+
+### Quota credit is the split share
+
+Sales Plan actuals (Closed_Won_Split_Revenue__c and Open_Split_Pipeline__c) roll up from Producer_Split__c and never from the full opportunity Amount. A $30K commission deal split 50/30/20 credits $15K, $9K, and $6K. Nobody gets double-counted, and the team total ties back to closed-won Amount.
+
+### Amount is commission, and premium is kept separate
+
+For a brokerage, the revenue that matters to the firm is commission, not premium. I put estimated annual commission in Amount so every standard pipeline and forecast report reads in the firm's revenue. I kept Premium__c on all 428 opportunities for carrier and account conversations.
+
+### Sales Rep sits on the opportunity instead of Owner
+
+Opportunity Owner has to be a User, and my producers aren't Users. So I added Sales_Rep__c, a lookup to Employee Contact filtered to the Employee record type, and it carries the producer on every pipeline, exception, and stale report. Region is stamped from the producer, so the Region filter on the dashboard follows the producer's book.
+
+### Exceptions are formulas, not manual flags
+
+Days_Past_Close__c, Has_Next_Step__c, and Is_Stale__c are all formulas. Is_Stale__c flags an open deal that's past its close date, is missing a next step, or hasn't had its next step updated in 14 or more days. Because they're formulas, the exception lists stay current without anyone having to maintain them.
+
+### The policy hierarchy is separate from the sales pipeline
+
+Broker groups own agency accounts, agency accounts write policies, and each policy links to a policyholder contact. I kept that in-force book apart from the new-business pipeline on purpose. I also used standard objects wherever I could, with Account and Contact record types, so the hierarchy works with standard reporting and portal patterns.
+
+---
 
 ## Dashboards
 
-**GTM Monday Board — Dir Sales**  
-Filters: Region, Segment, Close Date.  
-Open pipeline by stage and by rep, hygiene for past-due / missing next step, won dollars over the trailing year, quote-to-close on wins. The point is a Monday view a sales director would actually click.
+### Gulf Coast GTM Monday Cockpit
 
-![Monday board](screenshots/dir-sales-monday-board.webp)
+This is the dashboard I built for leadership to use in the Monday pipeline meeting. It shows open pipeline by stage and by rep. It has a "Fix these" table of past-due open opportunities that lists the Sales Rep, Stage, Amount, Close Date, and Next Step on every row. It also shows closed won for the last 30 days, this month, and year to date, plus open pipeline and closed won by line of business.
 
-**GTM Lead Engine — Conversion**  
-Filters: Region, Segment, Lead Source.  
-Status, source, rep, converted vs open — volume without conversion doesn’t count.
+A manager can filter by Close Date (Last 30 Days, This Month, This Year, Next 30, or Next 90) and by Region to narrow it down to one book.
 
-![Lead engine](screenshots/lead-engine-conversion.webp)
+![Monday Cockpit](screenshots/01-monday-cockpit.png)
+![Monday Cockpit filters](screenshots/02-monday-cockpit-lower.png)
+![Pipeline by Rep](screenshots/04-pipeline-by-rep.png)
 
-## SOQL
+The Exceptions report for past-due open opps is the one a leader opens when they don't trust the forecast.
 
-Files in [`soql/`](soql/). Same questions as the hygiene reports: open deals past close date, missing next step, pipeline by stage, quote-to-close on won deals, and (once activities exist) no touch in 14 days.
+![Past due exceptions](screenshots/03-past-due-exceptions.png)
 
-## Loom (when I record it)
+### Producer Dashboard
 
-Ninety seconds: dirty forecast problem → filter the Monday board → open the stuck list → same exception in Inspector → lead conversion by source.
+I built this one for producer economics and coaching. It shows open pipeline by producer at the split amount, closed won by producer at the split amount year to date, the stuck opportunities that Is Stale flags, and each producer's Sales Plan percent to goal.
 
-## Samples
+![Producer Dashboard](screenshots/05-producer-dashboard.png)
+![Sales Plan % to Goal](screenshots/09-sales-plan-pct-goal.png)
+![Stuck opportunities](screenshots/06-stuck-opps.png)
 
-[`data-samples/`](data-samples/) has small CSV slices so you can see field shape. The full dataset lives in the playground.
+### Records
 
-## Still building
+These are the record pages that back up the dashboards.
 
-- Logged emails / calls / tasks on opportunities (so Last Activity means something)
-- Stuck opps report: open and Close Date on or before today
-- Loss reason and original close date / push count
-- Notes on high-risk deals
+- This is an opportunity with its Producer Splits related list. ![Opportunity with Producer Splits](screenshots/07-opp-producer-splits.png)
+- This is an Employee Contact with the 2026 Sales Plan in its related list. ![Sales Plan related list](screenshots/12-employee-contact.png)
+- This is a single Sales Plan record. ![Sales Plan record](screenshots/08-sales-plan-record.png)
+- This is the Policies list view. ![Policies list](screenshots/11-policies-list.png)
 
-## Note
+---
 
-Fictional company names. Synthetic data. Don’t treat screenshots as production metrics.
+## Sales Plans
+
+Sales_Plan__c is a master-detail to Employee Contact, and I set up 20 plans for 2026, one for each producer. Each plan has an Annual_Revenue_Goal__c set per producer, along with quarterly goals for Q1 through Q4.
+
+The actuals come from the splits. Closed_Won_Split_Revenue__c is the sum of the producer's closed-won Split_Amount__c, and Open_Split_Pipeline__c is the sum of their open Split_Amount__c.
+
+From there, three formulas do the math. Percent_to_Goal__c divides closed-won split revenue by the annual goal. Gap_to_Goal__c subtracts closed-won split revenue from the annual goal. Pipeline_Coverage__c divides open split pipeline by the annual goal. That gives a manager the coaching conversation: who's short, and whether there's enough pipeline to close it.
+
+---
+
+## SOQL samples
+
+All of my queries are in [`soql/`](soql/). Each one answers a question I'd expect a sales leader or ops team to ask.
+
+- [`01-stale-open-opps.soql`](soql/01-stale-open-opps.soql) finds open opportunities that are past their close date.
+- [`02-missing-next-step.soql`](soql/02-missing-next-step.soql) finds open opportunities with no next step.
+- [`03-pipeline-by-stage.soql`](soql/03-pipeline-by-stage.soql) is an aggregate query that returns open pipeline count and Amount by stage.
+- [`04-stuck-close-date-le-today.soql`](soql/04-stuck-close-date-le-today.soql) finds stuck deals that are open with a close date of today or earlier, along with their stale flags.
+- [`05-quote-to-close-won.soql`](soql/05-quote-to-close-won.soql) shows the days from quote to close on won deals.
+- [`06-no-recent-activity-hint.soql`](soql/06-no-recent-activity-hint.soql) finds open deals with no activity in the last 14 days.
+- [`07-portal-customers-active-policies.soql`](soql/07-portal-customers-active-policies.soql) lists portal policyholders by broker group and agency by walking from Policy to Agency to Broker Group and from Policy to Policyholder, and the compact version returns 80 rows.
+- [`08-producer-split-credit.soql`](soql/08-producer-split-credit.soql) totals won producer split credit by producer for the current fiscal year.
+
+Here's SOQL 07 running in the Developer Console.
+
+![SOQL 07 in Developer Console](screenshots/10-policy-soql.png)
+
+---
+
+## Data samples
+
+The [`data-samples/`](data-samples/) folder has small CSV slices of Accounts, Opportunities, and Leads so you can see the shape of the fields.

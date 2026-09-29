@@ -1,5 +1,5 @@
 -- After Tasks/Emails exist, LastActivityDate becomes useful.
-SELECT Id, Name, Owner.Name, StageName, Amount, CloseDate, LastActivityDate, NextStep
+SELECT Id, Name, Sales_Rep__r.Name, StageName, Amount, CloseDate, LastActivityDate, NextStep
 FROM Opportunity
 WHERE IsClosed = false
   AND (LastActivityDate = null OR LastActivityDate < LAST_N_DAYS:14)

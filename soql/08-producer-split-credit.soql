@@ -1,0 +1,7 @@
+// Won producer split credit by producer for the current fiscal year.
+SELECT Producer__r.Name, SUM(Split_Amount__c) totalSplitAmount
+FROM Producer_Split__c
+WHERE Opportunity__r.IsWon = true
+  AND Opportunity__r.CloseDate = THIS_FISCAL_YEAR
+GROUP BY Producer__r.Name
+ORDER BY SUM(Split_Amount__c) DESC

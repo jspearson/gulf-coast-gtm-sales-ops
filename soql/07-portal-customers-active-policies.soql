@@ -1,0 +1,45 @@
+// Portfolio sample — cross-object relationship SOQL (Gulf Coast GTM API names)
+// Story: client portal needs policyholders with active policies, rolled up by broker group / agency.
+// Objects: Policy__c → Agency_Account__r → Broker_Group__r; Policyholder__r (Contact)
+// Proves: multi-hop relationships, portal-user filter, active-status filter, ordered rollup.
+
+// --- Compact: portal users with a policy ---
+SELECT Agency_Account__r.Broker_Group__r.Name,
+       Agency_Account__r.Name,
+       Policyholder__r.Name,
+       Policyholder__c,
+       Policyholder__r.Email,
+       Id,
+       Name
+FROM Policy__c
+WHERE Policyholder__r.Portal_User__c = true
+  AND Policyholder__r.RecordType.DeveloperName = 'Policyholder'
+  AND Agency_Account__r.Broker_Group__c != null
+ORDER BY Agency_Account__r.Broker_Group__r.Name, Agency_Account__r.Name, Policyholder__r.Name
+
+// --- Full: policyholders with ACTIVE policies ---
+SELECT Agency_Account__c,
+       Agency_Account__r.Name,
+       Agency_Account__r.Broker_Group__c,
+       Agency_Account__r.Broker_Group__r.Name,
+       Policyholder__c,
+       Policyholder__r.Name,
+       Policyholder__r.Email,
+       Policyholder__r.Portal_Email__c,
+       Policyholder__r.Phone,
+       Policyholder__r.MobilePhone,
+       Policyholder__r.HomePhone,
+       Policyholder__r.OtherPhone,
+       Policyholder__r.AssistantPhone,
+       Policyholder__r.MailingStreet,
+       Policyholder__r.MailingCity,
+       Policyholder__r.MailingState,
+       Policyholder__r.MailingPostalCode,
+       Policyholder__r.Portal_User__c,
+       Id,
+       Name
+FROM Policy__c
+WHERE Policyholder__r.RecordType.DeveloperName = 'Policyholder'
+  AND Agency_Account__r.Broker_Group__c != null
+  AND Policy_Status__c = 'Active'
+ORDER BY Agency_Account__r.Broker_Group__r.Name, Agency_Account__r.Name, Policyholder__r.Name

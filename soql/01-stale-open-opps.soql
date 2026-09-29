@@ -1,4 +1,4 @@
-SELECT Id, Name, StageName, Amount, CloseDate, Owner.Name, NextStep
+SELECT Id, Name, StageName, Amount, CloseDate, Sales_Rep__r.Name, NextStep
 FROM Opportunity
 WHERE IsClosed = false
   AND CloseDate < TODAY
