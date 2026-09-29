@@ -139,27 +139,47 @@ Broker groups own agency accounts, agency accounts write policies, and each poli
 
 ## Dashboards
 
-### Gulf Coast GTM Monday Cockpit
+### Sales Team Dashboard
 
-This is the dashboard I built for leadership to use in the Monday pipeline meeting. It shows open pipeline by stage and by rep. It has a "Fix these" table of past-due open opportunities that lists the Sales Rep, Stage, Amount, Close Date, and Next Step on every row. It also shows closed won for the last 30 days, this month, and year to date, plus open pipeline and closed won by line of business.
+This is the dashboard I built for leadership to use in the Monday pipeline meeting. I put a row of KPI tiles across the top so a leader gets the headline numbers before reading a single chart. When I took this screenshot, the tiles showed Premium Written This Year at $80M, New Business This Year at $1.6M, Cross-sell This Year at $3.6M, Renewals Due Next 90 at $4.2M, Win Rate This Year at 65.1%, Stale Deals at 175, Open Pipeline at $14M, and Past Due Deals at 53. Each tile links to the report behind it.
 
-A manager can filter by Close Date (Last 30 Days, This Month, This Year, Next 30, or Next 90) and by Region to narrow it down to one book.
+Below the tiles, the dashboard shows open pipeline by stage and by rep, closed won for the last 30 days, this month, and year to date, and open pipeline and closed won by line of business. A manager can filter by Close Date (Last 30 Days, This Month, This Year, Next 30, or Next 90) and by Region to narrow it down to one book.
 
-![Monday Cockpit](screenshots/01-monday-cockpit.png)
-![Monday Cockpit filters](screenshots/02-monday-cockpit-lower.png)
+![Sales Team Dashboard KPI tiles](screenshots/20-sales-team-kpis.png)
 ![Pipeline by Rep](screenshots/04-pipeline-by-rep.png)
 
-The Exceptions report for past-due open opps is the one a leader opens when they don't trust the forecast.
+Further down is the "Stuck: Past Due Open Opps" table, which lists the open opportunities that are past their close date with the Opportunity, Account, Sales Rep, Stage, and Amount on each row. The report behind it adds Close Date and Next Step. It's the table a leader opens when they don't trust the forecast, because it shows exactly which deals are slipping and who owns them.
 
-![Past due exceptions](screenshots/03-past-due-exceptions.png)
+![Sales Team Dashboard Stuck table](screenshots/21-sales-team-stuck-table.png)
 
 ### Producer Dashboard
 
-I built this one for producer economics and coaching. It shows open pipeline by producer at the split amount, closed won by producer at the split amount year to date, the stuck opportunities that Is Stale flags, and each producer's Sales Plan percent to goal.
+I built this one for producer economics and coaching. It opens with eight KPI tiles for Closed Won This Year, Open Pipeline, Open Next 30, Open Next 90, Win Rate This Year, Average Deal Size, Stale Deals, and Team % to Goal. Below the tiles, it shows open pipeline by producer at the split amount, closed won splits by producer year to date, the stuck opportunities that Is Stale flags, and each producer's Sales Plan percent to goal.
 
-![Producer Dashboard](screenshots/05-producer-dashboard.png)
+![Producer Dashboard KPI tiles](screenshots/18-producer-kpis.png)
+![Producer Dashboard charts](screenshots/19-producer-charts.png)
 ![Sales Plan % to Goal](screenshots/09-sales-plan-pct-goal.png)
 ![Stuck opportunities](screenshots/06-stuck-opps.png)
+
+### Producer Home
+
+I set the Producer Dashboard as the Home page of the Sales app, so the KPI tiles are the first thing anyone sees when they open the app. Further down the Home page, I added opportunity list views for recent closed won deals and open opportunities, with the Sales Rep on every row.
+
+![Producer Home in the Sales app](screenshots/13-producer-home.png)
+![Home page list views](screenshots/15-home-list-views.png)
+
+### Rep Performance tab
+
+The 20 reps are Employee Contacts, so I gave the Employee Contact record page a Performance tab. It starts with a % to Goal chart from the rep's Sales Plan, and below that it lists the rep's open pipeline, closed won deals, stale deals, and split credit. A manager can open any rep and have the whole coaching conversation from one page.
+
+![Rep Performance tab with % to Goal and open pipeline](screenshots/14-rep-performance.png)
+![Rep Performance tab lists and Split Credit](screenshots/16-rep-performance-lists.png)
+
+### Split credit and Deal Amount
+
+I added a Deal Amount field to Producer Split that shows the full opportunity Amount next to the rep's Split % and Split Amount. That way anyone reading the Split Credit list sees the whole deal, the rep's share, and the credit that share earns on the same row, and they can check the math without opening the opportunity.
+
+![Split Credit list with Deal Amount](screenshots/17-split-credit-deal-amount.png)
 
 ### Records
 
@@ -184,7 +204,7 @@ From there, three formulas do the math. Percent_to_Goal__c divides closed-won sp
 
 ## SOQL samples
 
-All of my queries are in [`soql/`](soql/). Each one answers a question I'd expect a sales leader or ops team to ask.
+The dashboards and reports in this org are all standard Salesforce reports. I use SOQL for ad hoc questions that a standard report can't answer, such as walking the policy hierarchy across several objects. All of my queries are in [`soql/`](soql/), and each one answers a question I'd expect a sales leader or ops team to ask.
 
 - [`01-stale-open-opps.soql`](soql/01-stale-open-opps.soql) finds open opportunities that are past their close date.
 - [`02-missing-next-step.soql`](soql/02-missing-next-step.soql) finds open opportunities with no next step.
