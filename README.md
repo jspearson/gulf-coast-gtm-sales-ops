@@ -1,4 +1,4 @@
-# Gulf Coast GTM Co: My Sales Ops Salesforce Portfolio
+# Salesforce Sales Ops Portfolio
 
 I'm Joe Pearson, a Salesforce Certified Administrator moving into Sales Ops and RevOps. I built this Salesforce Developer Edition org (Lightning) to show how I'd run Sales Ops for a sales team that gets paid on commission. It covers a Monday pipeline dashboard a sales leader can trust, split credit and quota math for each producer, exception reporting, and a policy data model with relationship SOQL. You can find me on [LinkedIn](https://www.linkedin.com/in/joe-pearson-Salesforce).
 
