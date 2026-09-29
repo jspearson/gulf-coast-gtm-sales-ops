@@ -1,8 +1,8 @@
-Name,Type,Industry,BillingState,Website,Description
-Suncoast Mutual Insurance,Customer - Direct,Insurance,FL,https://www.suncoastmutualinsurance.example.com,Sample customer for Gulf Coast GTM portfolio (East / SMB)
-Mangrove Health Systems,Customer - Direct,Healthcare,FL,https://www.mangrovehealthsystems.example.com,Sample customer for Gulf Coast GTM portfolio (West / Mid-Market)
-Palmetto Freight Lines,Customer - Channel,Transportation,SC,https://www.palmettofreightlines.example.com,Sample customer for Gulf Coast GTM portfolio (Central / Enterprise)
-Bayfront Analytics,Customer - Direct,Technology,FL,https://www.bayfrontanalytics.example.com,Sample customer for Gulf Coast GTM portfolio (East / SMB)
-Coral Key Credit Union,Customer - Direct,Banking,FL,https://www.coralkeycreditunion.example.com,Sample customer for Gulf Coast GTM portfolio (West / Mid-Market)
-Ironwood Manufacturing,Customer - Channel,Manufacturing,GA,https://www.ironwoodmanufacturing.example.com,Sample customer for Gulf Coast GTM portfolio (Central / Enterprise)
-Citrus Belt Distributors,Customer - Direct,Wholesale,FL,https://www.citrusbeltdistributors.example.com,Sample customer for Gulf Coast GTM portfolio (East / SMB)
+Name,Type,Industry,Website,Description
+Anna Maria Builders,Customer - Channel,Construction,annamariabuilders.demo,Sample customer for Gulf Coast GTM portfolio (Central / Enterprise)
+Bradenton Inns,Customer - Direct,Hospitality,bradentoninns.demo,Sample customer for Gulf Coast GTM portfolio (East / SMB)
+Bradenton Yacht Club,Customer - Direct,Marina / Marine,bradentonyachtclub.demo,Expansion account batch (Central / Enterprise)
+Punta Gorda Marina,Customer - Channel,Marina / Marine,puntagordamarina.demo,Expansion account batch (East / SMB)
+Ruskin Property Partners,Customer - Channel,Property Management,ruskinpropertypartners.demo,Expansion account batch (East / SMB)
+Siesta Key Hotel Partners,Customer - Direct,Hospitality,siestakeyhotelpartners.demo,Expansion account batch (West / Mid-Market)
+Tampa Bay Orthopedics,Customer - Direct,Healthcare,tampabayorthopedics.demo,Expansion account batch (West / Mid-Market)
