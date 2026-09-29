@@ -1,6 +1,7 @@
 // Portfolio sample — cross-object relationship SOQL (Gulf Coast GTM API names)
-// Story: client portal needs policyholders with active policies, rolled up by broker group / agency.
-// Objects: Policy__c → Agency_Account__r → Broker_Group__r; Policyholder__r (Contact)
+// Story: client portal needs Client contacts (portal flag on) with active policies, rolled up by broker group / agency.
+// Objects: Policy__c → Agency_Account__r → Broker_Group__r; Policyholder__r (Client Contact)
+// Policy Name is "<Policy Number> - <Line of Business> - <Risk State>" (set by the Policy: Set Name flow).
 // Proves: multi-hop relationships, portal-user filter, active-status filter, ordered rollup.
 
 // --- Compact: portal users with a policy ---
@@ -10,14 +11,16 @@ SELECT Agency_Account__r.Broker_Group__r.Name,
        Policyholder__c,
        Policyholder__r.Email,
        Id,
-       Name
+       Name,
+       Policy_Number__c,
+       Risk_State__c
 FROM Policy__c
 WHERE Policyholder__r.Portal_User__c = true
-  AND Policyholder__r.RecordType.DeveloperName = 'Policyholder'
+  AND Policyholder__r.RecordType.DeveloperName = 'Client'
   AND Agency_Account__r.Broker_Group__c != null
 ORDER BY Agency_Account__r.Broker_Group__r.Name, Agency_Account__r.Name, Policyholder__r.Name
 
-// --- Full: policyholders with ACTIVE policies ---
+// --- Full: Client contacts on ACTIVE policies ---
 SELECT Agency_Account__c,
        Agency_Account__r.Name,
        Agency_Account__r.Broker_Group__c,
@@ -37,9 +40,15 @@ SELECT Agency_Account__c,
        Policyholder__r.MailingPostalCode,
        Policyholder__r.Portal_User__c,
        Id,
-       Name
+       Name,
+       Policy_Number__c,
+       Coverage_Line__c,
+       Risk_Street__c,
+       Risk_City__c,
+       Risk_State__c,
+       Risk_Zip__c
 FROM Policy__c
-WHERE Policyholder__r.RecordType.DeveloperName = 'Policyholder'
+WHERE Policyholder__r.RecordType.DeveloperName = 'Client'
   AND Agency_Account__r.Broker_Group__c != null
   AND Policy_Status__c = 'Active'
 ORDER BY Agency_Account__r.Broker_Group__r.Name, Agency_Account__r.Name, Policyholder__r.Name

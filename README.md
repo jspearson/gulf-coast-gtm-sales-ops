@@ -34,7 +34,8 @@ erDiagram
     CONTACT_EMPLOYEE ||--o{ SALES_PLAN : "Contact__c (master-detail)"
     BROKER_GROUP ||--o{ ACCOUNT_AGENCY : "Broker_Group__c"
     ACCOUNT_AGENCY ||--o{ POLICY : "Agency_Account__c"
-    CONTACT_POLICYHOLDER ||--o{ POLICY : "Policyholder__c"
+    ACCOUNT_CLIENT ||--o{ CONTACT_CLIENT : "AccountId"
+    CONTACT_CLIENT ||--o{ POLICY : "Policyholder__c"
     CONTACT_EMPLOYEE |o--o{ POLICY : "Producer__c (optional)"
 
     ACCOUNT_CLIENT {
@@ -81,15 +82,22 @@ erDiagram
         lookup Broker_Group__c
     }
     POLICY {
-        autonumber Name "GTM-00000"
+        string Name "Number - Line of Business - State (flow)"
+        string Policy_Number__c "unique, external ID"
+        picklist Coverage_Line__c "Line of Business"
         picklist Policy_Status__c
         currency Premium__c
-        picklist Coverage_Line__c
         date Effective_Date__c
         date Expiration_Date__c
+        string Risk_Street__c
+        string Risk_City__c
+        picklist Risk_State__c
+        string Risk_Zip__c
     }
-    CONTACT_POLICYHOLDER {
+    CONTACT_CLIENT {
         string Name
+        string Title
+        picklist Buying_Role__c
         checkbox Portal_User__c
         email Portal_Email__c
     }
@@ -97,7 +105,7 @@ erDiagram
 
 I used record types on Account and Contact so I could stay on standard objects wherever possible. On Account, the Client record type holds the insured businesses, which are the 144 client accounts. The Agency record type is the producing or retail agency, and each one sits under a Broker Group.
 
-On Contact, I set up three record types. Client contacts are the buyers and influencers at client accounts. Employee contacts are the 20 producers, and they carry Region, Team, and Sales Plans. Policyholder contacts are the people tied to policies, and they have a portal flag.
+On Contact, I use two record types. Client contacts are the buyers and influencers at client accounts, and they're also the policyholders on in-force policies, with a portal flag for the ones who use the client portal. Employee contacts are the 20 producers, and they carry Region, Team, and Sales Plans.
 
 I gave Client and Employee contacts their own Lightning record pages and layouts, assigned by record type. That way producer fields like Region, Team, and Sales Plans never show up on a client record, and client fields like buying role and relationship strength never show up on a producer.
 
@@ -133,7 +141,7 @@ Days_Past_Close__c, Has_Next_Step__c, and Is_Stale__c are all formulas. Is_Stale
 
 ### The policy hierarchy is separate from the sales pipeline
 
-Broker groups own agency accounts, agency accounts write policies, and each policy links to a policyholder contact. I kept that in-force book apart from the new-business pipeline on purpose. I also used standard objects wherever I could, with Account and Contact record types, so the hierarchy works with standard reporting and portal patterns.
+Broker groups own agency accounts, agency accounts write policies, and each policy links to a Client contact at the insured account as its policyholder. Each policy carries a unique Policy Number and a risk address, and a before-save flow keeps the record name in the format Policy Number - Line of Business - Risk State (for example, CP-2099782 - Commercial Property - FL). I kept that in-force book apart from the new-business pipeline on purpose. I also used standard objects wherever I could, with Account and Contact record types, so the hierarchy works with standard reporting and portal patterns.
 
 ---
 
@@ -212,7 +220,7 @@ The dashboards and reports in this org are all standard Salesforce reports. I us
 - [`04-stuck-close-date-le-today.soql`](soql/04-stuck-close-date-le-today.soql) finds stuck deals that are open with a close date of today or earlier, along with their stale flags.
 - [`05-quote-to-close-won.soql`](soql/05-quote-to-close-won.soql) shows the days from quote to close on won deals.
 - [`06-no-recent-activity-hint.soql`](soql/06-no-recent-activity-hint.soql) finds open deals with no activity in the last 14 days.
-- [`07-portal-customers-active-policies.soql`](soql/07-portal-customers-active-policies.soql) lists portal policyholders by broker group and agency by walking from Policy to Agency to Broker Group and from Policy to Policyholder, and the compact version returns 80 rows.
+- [`07-portal-customers-active-policies.soql`](soql/07-portal-customers-active-policies.soql) lists portal Client contacts on policies by broker group and agency by walking from Policy to Agency to Broker Group and from Policy to the policyholder contact, and the compact version returns 80 rows.
 - [`08-producer-split-credit.soql`](soql/08-producer-split-credit.soql) totals won producer split credit by producer for the current fiscal year.
 
 Here's SOQL 07 running in the Developer Console.
